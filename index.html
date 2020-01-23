@@ -1,0 +1,85 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    
+    <title>Last.fm Time Charts</title>
+    <meta name="description" content="Time based sorted charts for last.fm users">
+    <meta name="author" content="IAmTheBlackMetal">
+    
+    <link rel="stylesheet" href="css/styles.css?v=1.0">
+    <script type="text/javascript" src="js/main.js"></script>
+    
+</head>
+
+<body>
+    <div id="page-wrap">
+        
+        <!-- Header -->
+        <h1>Last.fm Time Charts</h1>
+        <h2>Ever want to see your charts sorted by playtime instead of playcount?<br>Well now you can!</h2>
+        
+        <!-- Form -->
+        <div id="form-holder">
+            <form class="timeChart" action="#" onsubmit="createCharts();" method="get">
+                <br>
+                <input type="text" name="user" id="usernameInput" placeholder="Last.fm username..." pattern="[A-Za-z0-9_-]{2,25}" autofocus="" required="">
+                <br>
+                <br>
+                <select name="metric" id="chartMetric">
+                    <option value="artist">Artists</option>
+<!--
+                    <option value="album">Albums</option>
+                    <option value="track">Tracks</option>
+-->
+                </select>
+
+                <select name="timeframe" id="chartTimeframe">
+                    <option value="7day">7 days</option>
+                    <option value="1month">1 month</option>
+                    <option value="3month">3 months</option>
+                    <option value="6month">6 months</option>
+                    <option value="12month">12 months</option>
+                    <option value="overall">Overall</option>
+                </select>
+
+                <select name="size" id="chartSize">
+                    <option value=8>Top 8</option>
+                    <option value=16>Top 16</option>
+                    <option value=25>Top 25</option>
+                    <option value=50>Top 50</option>
+                    <option value=100>Top 100</option>
+                </select>
+                <br>
+                <br>
+                <input type="button" name="submit" value="Generate Charts" id="Submit" onClick="createCharts();">
+            </form>
+        </div>
+        
+        <!-- Content -->
+        <h3></h3>
+        <p></p>
+        <p id="loadingMessages"></p>
+        <p id="chartOutput"></p>
+<!--
+        <div id="chartOutput">
+            <table id="dymanictable"  border="1" cellpadding="2">
+                <tr>
+
+                    <td><b>Artist</b></td>
+                    <td><b>Total Playtime</b></td>
+                </tr>
+            </table>
+        </div>
+-->
+        <div id="footer">
+            <ul>
+                <a href="http://www.Last.fm/user/pmcdonough8133">IAmtheBlackMetal (Creator)</a>
+                |
+                <a href="mailto:p.mcdonough8133@gmail.com">Contact</a>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
