@@ -19,7 +19,7 @@ function createCharts() {
 //        var artistDuration = [];
         var artistsList = [];
         var promiseArtist = new Promise(function(resolve, reject) {
-            var restAPIcall = "http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=" + lastfmReturnLimit + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
+            var restAPIcall = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=" + lastfmReturnLimit + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
             var request = new XMLHttpRequest();
             request.open('GET', restAPIcall, true);
             request.onload = function() {
@@ -79,7 +79,7 @@ function createCharts() {
 
 function gatherTracks(listofNamesTemp) {
     return new Promise (function(resolve) {
-        var restAPIcallTwo = "http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=1&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
+        var restAPIcallTwo = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=1&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
         var totalPageLimit;
         var promises = [];
         var requestTwo = new XMLHttpRequest();
@@ -117,7 +117,7 @@ function gatherTracks(listofNamesTemp) {
 
 function gatherTracksPerPage(listofNames, currentPage) {
     return new Promise (function(resolve) {
-        var restAPIcallThree = "http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=" + currentPage + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
+        var restAPIcallThree = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=" + currentPage + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
         var requestThree = new XMLHttpRequest();
         requestThree.onreadystatechange=function() {
             if (requestThree.readyState === 4) {
