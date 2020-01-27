@@ -66,7 +66,9 @@ function createCharts() {
     //                    row.insertCell(1).innerHTML= hours + ":" + minutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
     //                    row.insertCell(2).innerHTML= ccar.value;
                 });
-                console.log("These tracks have no time data: ",tracksWithNoTime);
+//                console.log("These tracks have no time data: ",tracksWithNoTime);
+                document.getElementById("popUpBox").innerHTML = tracksWithNoTime.join("<br>") + "<br>";
+                document.getElementById("myBtn").style.display = "flex";
             });
         });
     } else if (lastfmMetric == "album") {
@@ -127,7 +129,7 @@ function gatherTracksPerPage(listofNames, currentPage) {
                     console.log("Last.fm returned "+requestThree.status+" error. Page "+currentPage+" was lost. Trying again for more accurate results.");
                     resolve();
                     if (requestThree.status === 500) {
-                        gatherTracksPerPage(listofNames,currentPage)
+                        promises.push(gatherTracksPerPage(listofNames,currentPage));
                     }
                 }
             }

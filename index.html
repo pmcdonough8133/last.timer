@@ -62,6 +62,15 @@
         <p></p>
         <p id="loadingMessages"></p>
         <p id="chartOutput"></p>
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="popUpBox"></p>
+          </div>
+        </div>
+        <div id="badTrackButtonContainer">
+            <button id="badDataButton" class="button">Check for Tracks with no time data</button>
+        </div>
 <!--
         <div id="chartOutput">
             <table id="dymanictable"  border="1" cellpadding="2">
@@ -81,5 +90,24 @@
             </ul>
         </div>
     </div>
+    <script>
+    var popUp = document.getElementById("myModal");
+    var popUpButton = document.getElementById("badDataButton");
+    var span = document.getElementsByClassName("close")[0];
+
+    popUpButton.onclick = function() {
+      popUp.style.display = "block";
+    }
+
+    span.onclick = function() {
+      popUp.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == popUp) {
+        popUp.style.display = "none";
+      }
+    }
+    </script>
 </body>
 </html>
