@@ -68,7 +68,7 @@ function createCharts() {
                 });
 //                console.log("These tracks have no time data: ",tracksWithNoTime);
                 document.getElementById("popUpBox").innerHTML = tracksWithNoTime.join("<br>") + "<br>";
-                document.getElementById("myBtn").style.display = "flex";
+                document.getElementById("badDataButton").style.display = "block";
             });
         });
     } else if (lastfmMetric == "album") {
