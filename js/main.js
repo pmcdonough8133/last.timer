@@ -74,18 +74,11 @@ function createCharts() {
                     entry.durMinutes = Math.floor((entry.duration-entry.durHours*3600)/60);
                     entry.durSeconds = entry.duration-entry.durHours*3600-entry.durMinutes*60;
 //                    chartOutput.innerHTML += entry.artistName + ": " + entry.durHours + ":" + entry.durMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + entry.durSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + " playtime across "+entry.playcount+" plays<br>";
-
-    //                    var table = document.getElementById("dymanictable");
-    //                    var rowCount = table.rows.length;
-    //                    var row = table.insertRow(rowCount);
-    //                    row.insertCell(0).innerHTML= entry.artistName;
-    //                    row.insertCell(1).innerHTML= hours + ":" + minutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
-    //                    row.insertCell(2).innerHTML= ccar.value;
                 });
                 createArtistTable(durationDict);
 //                console.log("These tracks have no time data: ",tracksWithNoTime);
                 tracksWithNoTime.sort();
-                document.getElementById("popUpBox").innerHTML = tracksWithNoTime.join("<br>") + "<br>";
+                document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data.<br>"+tracksWithNoTime.join("<br>") + "<br>";
                 document.getElementById("badDataButton").style.display = "block";
             });
         });
@@ -200,6 +193,7 @@ function createArtistTable(dataDictionary) {
     document.getElementById("chartOutput").innerHTML = ""
     var table = document.createElement('table');
     table.setAttribute('id', 'tableOfOutput');
+//    table.setAttribute('class', 'js-sort-table')
     var tableHeader = ["Time Rank", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change", "Avg Track Length"];
     var tr = table.insertRow(-1);
     for (var h = 0; h < tableHeader.length; h++) {

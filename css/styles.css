@@ -154,7 +154,8 @@ input,select {
     outline:0;
     border-radius:20px;
     box-shadow:5px;
-    text-align:center
+    text-align: center;
+    position: relative;
 }
 
 input {
@@ -348,4 +349,67 @@ tr:hover {
 
 tr:nth-child(even) {
 /*    background-color: lightyellow;*/
+}
+
+#detailsParagraph {
+    font-size: 10px;
+}
+
+#tooltipDiv {
+    color: firebrick;
+    font-size: 23px;
+    font-weight: bold;
+    font-family: monospace;
+/*    position: fixed;*/
+    border-bottom: none;
+}
+
+#tooltipDiv:hover {
+    cursor: pointer
+}
+
+#iInCircle {
+    position: relative;
+    width: 25px;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    font-size: 12px;
+    visibility: hidden;
+    width: 320px;
+    background-color: firebrick;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -160px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: -1px 0px 10px 1px #555;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: firebrick transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
