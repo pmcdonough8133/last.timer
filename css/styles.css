@@ -355,6 +355,18 @@ tr:nth-child(even) {
     font-size: .8em;
 }
 
+@media only screen and (max-width: 768px) {
+  detailsParagraph {
+    font-size: 8px;
+  }
+}
+
+@media only screen and (max-width: 320px) {
+  detailsParagraph {
+    font-size: 6px;
+  }
+}
+
 #tooltipDiv {
     color: firebrick;
     font-size: 23px;
