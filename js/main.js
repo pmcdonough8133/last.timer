@@ -3,9 +3,12 @@ var lastfmMetric;// = document.getElementById("chartMetric").value;
 var lastfmTimeframe;// = document.getElementById("chartTimeframe").value;
 var lastfmReturnLimit;// = document.getElementById("chartSize").value;
 var durationDict;// = []
+var chartOutput;
 var tracksWithNoTime;
 
+
 function createCharts() {
+    chartOutput = document.getElementById("chartOutput")
     durationDict = [];
     tracksWithNoTime = [];
     lastfmUsername = document.getElementById("usernameInput").value;
@@ -27,12 +30,21 @@ function createCharts() {
                 try {
                     for (var i = 0; i < data.topartists.artist.length; i++) {
                         artistsList.push(data.topartists.artist[i].name);
-                        durationDict.push({artistName:data.topartists.artist[i].name, duration:0});
+                        durationDict.push({
+                            artistName:data.topartists.artist[i].name,
+                            duration:0,
+                            durHours:null,
+                            durMinutes:null,
+                            durSeconds:null,
+                            playcount:0,
+                            playtimeRank:null,
+                            playcountRank:i+1,
+                            emptyTracks:0
+                        });
                         if (durationDict.length == lastfmReturnLimit) {
     //                        console.log(durationDict);
                             resolve();
                         }
-        //                document.getElementById("chartOutput").innerHTML += data.topartists.artist[i].name + " " + data.topartists.artist[i].playcount + "<br>";
                     }
                 }
                 catch(err) {
@@ -49,15 +61,19 @@ function createCharts() {
             document.getElementById("loadingMessages").innerHTML = "Collecting Tracks..."
             gatherTracks(artistsList).then(function () {
                 document.getElementById("loadingMessages").innerHTML = ""
-                document.getElementById("chartOutput").innerHTML = ""
+                chartOutput.innerHTML = ""
                 durationDict.sort(function(a, b){
                     return b.duration - a.duration;
                 });
-                durationDict.forEach(function(entry) {
-                    var hours = Math.floor(entry.duration/3600)
-                    var minutes = Math.floor((entry.duration-(Math.floor(entry.duration/3600)*3600))/60)
-                    var seconds = entry.duration-Math.floor(entry.duration/3600)*3600-Math.floor((entry.duration-(Math.floor(entry.duration/3600)*3600))/60)*60
-                    document.getElementById("chartOutput").innerHTML += entry.artistName + ": " + hours + ":" + minutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + " playtime.<br>"
+                for(var z = 0; z < durationDict.length; z++) {
+                    durationDict[z].playtimeRank = z+1;
+                }
+                durationDict.forEach(function(entry, index) {
+//                    console.log(entry);
+                    entry.durHours = Math.floor(entry.duration/3600);
+                    entry.durMinutes = Math.floor((entry.duration-entry.durHours*3600)/60);
+                    entry.durSeconds = entry.duration-entry.durHours*3600-entry.durMinutes*60;
+//                    chartOutput.innerHTML += entry.artistName + ": " + entry.durHours + ":" + entry.durMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + entry.durSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + " playtime across "+entry.playcount+" plays<br>";
 
     //                    var table = document.getElementById("dymanictable");
     //                    var rowCount = table.rows.length;
@@ -66,7 +82,9 @@ function createCharts() {
     //                    row.insertCell(1).innerHTML= hours + ":" + minutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
     //                    row.insertCell(2).innerHTML= ccar.value;
                 });
+                createArtistTable(durationDict);
 //                console.log("These tracks have no time data: ",tracksWithNoTime);
+                tracksWithNoTime.sort();
                 document.getElementById("popUpBox").innerHTML = tracksWithNoTime.join("<br>") + "<br>";
                 document.getElementById("badDataButton").style.display = "block";
             });
@@ -145,9 +163,11 @@ function gatherTracksPerPage(listofNames, currentPage) {
                             if (durationDict[d].artistName == data.toptracks.track[i].artist.name) {
                                 var addDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration;
                                 if (addDuration == 0 ) {
-                                    tracksWithNoTime.push(data.toptracks.track[i].artist.name+" --- "+data.toptracks.track[i].name)
+                                    tracksWithNoTime.push(data.toptracks.track[i].artist.name+" --- "+data.toptracks.track[i].name);
+                                    durationDict[d].emptyTracks += Number(data.toptracks.track[i].playcount);
                                 }
                                 durationDict[d].duration += addDuration;
+                                durationDict[d].playcount += Number(data.toptracks.track[i].playcount);
 //                                console.log("Adding "+addDuration+" to "+durationDict[d].artistName)
                             }
                         }
@@ -173,4 +193,60 @@ function promiseProgress(proms, progress) {
         });
     }
     return Promise.all(proms)
+}
+
+function createArtistTable(dataDictionary) {
+    console.log(dataDictionary);
+    document.getElementById("chartOutput").innerHTML = ""
+    var table = document.createElement('table');
+    table.setAttribute('id', 'tableOfOutput');
+    var tableHeader = ["Time Rank", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change", "Avg Track Length"];
+    var tr = table.insertRow(-1);
+    for (var h = 0; h < tableHeader.length; h++) {
+        var th = document.createElement('th');
+        th.innerHTML = tableHeader[h];
+        tr.appendChild(th);
+    }
+    for (var c = 0; c < dataDictionary.length; c++) {
+        tr = table.insertRow(-1);
+        
+        var tdTimeRank = document.createElement('td');
+        tdTimeRank = tr.insertCell(-1);
+        tdTimeRank.innerHTML = dataDictionary[c].playtimeRank;
+        
+        var tdArtist = document.createElement('td');
+        tdArtist = tr.insertCell(-1);
+        tdArtist.innerHTML = dataDictionary[c].artistName;
+        
+        var tdPlaytime = document.createElement('td');
+        tdPlaytime = tr.insertCell(-1);
+        tdPlaytime.innerHTML = dataDictionary[c].durHours + ":" + dataDictionary[c].durMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + dataDictionary[c].durSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+        
+        var tdPlaycount = document.createElement('td');
+        tdPlaycount = tr.insertCell(-1);
+        tdPlaycount.innerHTML = dataDictionary[c].playcount;
+        
+        var tdPlayRank = document.createElement('td');
+        tdPlayRank = tr.insertCell(-1);
+        tdPlayRank.innerHTML = dataDictionary[c].playcountRank;
+        
+        var rankChange = Number(dataDictionary[c].playcountRank-dataDictionary[c].playtimeRank)
+        var tdRankChange = document.createElement('td');
+        tdRankChange = tr.insertCell(-1);
+        if (rankChange > 0) {
+            tdRankChange.innerHTML = "+"+String(rankChange);
+        } else {
+            tdRankChange.innerHTML = String(rankChange);
+        }
+        
+        var averageTrackLength = dataDictionary[c].duration/(dataDictionary[c].playcount - dataDictionary[c].emptyTracks);
+        var averageTrackLengthMinutes = Math.floor(averageTrackLength/60);
+        var averageTrackLengthSeconds = Math.round(averageTrackLength-averageTrackLengthMinutes*60);
+//        console.log("Average Track Length: "+averageTrackLength,"Minutes: "+averageTrackLengthMinutes,"Seconds: "+averageTrackLengthSeconds)
+        var tdTrackAvg = document.createElement('td');
+        tdTrackAvg = tr.insertCell(-1);
+        tdTrackAvg.innerHTML = averageTrackLengthMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + averageTrackLengthSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+    }
+    
+    document.getElementById("chartOutput").appendChild(table);
 }
