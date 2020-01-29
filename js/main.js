@@ -5,7 +5,8 @@ var lastfmReturnLimit;// = document.getElementById("chartSize").value;
 var durationDict;// = []
 var chartOutput;
 var tracksWithNoTime;
-
+var promises;
+var fiveHundredAlert = 1
 
 function createCharts() {
     chartOutput = document.getElementById("chartOutput")
@@ -24,6 +25,19 @@ function createCharts() {
         var promiseArtist = new Promise(function(resolve, reject) {
             var restAPIcall = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=" + lastfmReturnLimit + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
             var request = new XMLHttpRequest();
+            request.onreadystatechange=function() {
+                if (request.readyState === 4) {
+                    if (request.status === 200) {
+                        // do nothing
+                    } else {
+                        console.log("Last.fm returned "+request.status+" error. Page "+currentPage+" was lost. Trying again for more accurate results.");
+                        if (request.status === 500) {
+                            alert("Last.fm returned an Internal Server Error. Please retry.");
+                            return;
+                        }
+                    }
+                }
+            }
             request.open('GET', restAPIcall, true);
             request.onload = function() {
                 var data = JSON.parse(this.response);
@@ -68,7 +82,7 @@ function createCharts() {
                 for(var z = 0; z < durationDict.length; z++) {
                     durationDict[z].playtimeRank = z+1;
                 }
-                durationDict.forEach(function(entry, index) {
+                durationDict.forEach(function(entry) {
 //                    console.log(entry);
                     entry.durHours = Math.floor(entry.duration/3600);
                     entry.durMinutes = Math.floor((entry.duration-entry.durHours*3600)/60);
@@ -94,16 +108,16 @@ function gatherTracks(listofNamesTemp) {
     return new Promise (function(resolve) {
         var restAPIcallTwo = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=1&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
         var totalPageLimit;
-        var promises = [];
+        promises = [];
         var requestTwo = new XMLHttpRequest();
         requestTwo.onreadystatechange=function() {
             if (requestTwo.readyState === 4) {
                 if (requestTwo.status === 200) {
-                    
+                    //do nothing
                 } else {
                     console.log("Last.fm returned "+requestTwo.status+" error on page check.");
                     if (requestTwo.status === 500) {
-                        gatherTracks(listofNames)
+                        gatherTracks(listofNamesTemp)
                     }
                 }
             }
@@ -135,13 +149,18 @@ function gatherTracksPerPage(listofNames, currentPage) {
         requestThree.onreadystatechange=function() {
             if (requestThree.readyState === 4) {
                 if (requestThree.status === 200) {
-                    
+                    // do nothing
                 } else {
                     console.log("Last.fm returned "+requestThree.status+" error. Page "+currentPage+" was lost. Trying again for more accurate results.");
-                    resolve();
                     if (requestThree.status === 500) {
                         promises.push(gatherTracksPerPage(listofNames,currentPage));
                     }
+                    setTimeout(resolve(),10000)
+                    if (fiveHundredAlert > 0) {
+                        fiveHundredAlert--;
+                        alert("This app has encountered Internal Service Errors from Last.fm, it will try to complete but it may lose some data.  Check the playcounts for accuracy, re-run to try again.")
+                    }
+//                    resolve();
                 }
             }
         }
@@ -189,7 +208,7 @@ function promiseProgress(proms, progress) {
 }
 
 function createArtistTable(dataDictionary) {
-    console.log(dataDictionary);
+//    console.log(dataDictionary);
     document.getElementById("chartOutput").innerHTML = ""
     var table = document.createElement('table');
     table.setAttribute('id', 'tableOfOutput');
