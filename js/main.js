@@ -55,7 +55,7 @@ function createCharts() {
                             playcountRank:i+1,
                             emptyTracks:0
                         });
-                        if (durationDict.length == lastfmReturnLimit) {
+                        if (durationDict.length == data.topartists.artist.length) {
     //                        console.log(durationDict);
                             resolve();
                         }
@@ -212,7 +212,7 @@ function createArtistTable(dataDictionary) {
     document.getElementById("chartOutput").innerHTML = ""
     var table = document.createElement('table');
     table.setAttribute('id', 'tableOfOutput');
-//    table.setAttribute('class', 'js-sort-table')
+    table.setAttribute('class', 'table table-striped table-bordered')
     var tableHeader = ["Time Rank", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change", "Avg Track Length"];
     var tr = table.insertRow(-1);
     for (var h = 0; h < tableHeader.length; h++) {
