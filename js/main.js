@@ -94,6 +94,7 @@ function createCharts() {
                 tracksWithNoTime.sort();
                 document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data.<br>"+tracksWithNoTime.join("<br>") + "<br>";
                 document.getElementById("badDataButton").style.display = "block";
+//                document.getElementById("tablePages").style.display = "block";
             });
         });
     } else if (lastfmMetric == "album") {
@@ -212,40 +213,37 @@ function createArtistTable(dataDictionary) {
     document.getElementById("chartOutput").innerHTML = ""
     var table = document.createElement('table');
     table.setAttribute('id', 'tableOfOutput');
-    table.setAttribute('class', 'table table-striped table-bordered')
+    table.setAttribute('class', 'display')
+    table.setAttribute('style', 'width:100%')
     var tableHeader = ["Time Rank", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change", "Avg Track Length"];
-    var tr = table.insertRow(-1);
-    for (var h = 0; h < tableHeader.length; h++) {
-        var th = document.createElement('th');
-        th.innerHTML = tableHeader[h];
-        tr.appendChild(th);
-    }
+    
+    var tr;
     for (var c = 0; c < dataDictionary.length; c++) {
-        tr = table.insertRow(-1);
+        tr = table.insertRow();
         
         var tdTimeRank = document.createElement('td');
-        tdTimeRank = tr.insertCell(-1);
+        tdTimeRank = tr.insertCell();
         tdTimeRank.innerHTML = dataDictionary[c].playtimeRank;
         
         var tdArtist = document.createElement('td');
-        tdArtist = tr.insertCell(-1);
+        tdArtist = tr.insertCell();
         tdArtist.innerHTML = dataDictionary[c].artistName;
         
         var tdPlaytime = document.createElement('td');
-        tdPlaytime = tr.insertCell(-1);
+        tdPlaytime = tr.insertCell();
         tdPlaytime.innerHTML = dataDictionary[c].durHours + ":" + dataDictionary[c].durMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + dataDictionary[c].durSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
         
         var tdPlaycount = document.createElement('td');
-        tdPlaycount = tr.insertCell(-1);
+        tdPlaycount = tr.insertCell();
         tdPlaycount.innerHTML = dataDictionary[c].playcount;
         
         var tdPlayRank = document.createElement('td');
-        tdPlayRank = tr.insertCell(-1);
+        tdPlayRank = tr.insertCell();
         tdPlayRank.innerHTML = dataDictionary[c].playcountRank;
         
         var rankChange = Number(dataDictionary[c].playcountRank-dataDictionary[c].playtimeRank)
         var tdRankChange = document.createElement('td');
-        tdRankChange = tr.insertCell(-1);
+        tdRankChange = tr.insertCell();
         if (rankChange > 0) {
             tdRankChange.innerHTML = "+"+String(rankChange);
         } else {
@@ -261,5 +259,25 @@ function createArtistTable(dataDictionary) {
         tdTrackAvg.innerHTML = averageTrackLengthMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + averageTrackLengthSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
     }
     
+    var header = table.createTHead();
+    var trHead = header.insertRow(0);
+    for (var h = 0; h < tableHeader.length; h++) {
+        var th = document.createElement('th');
+        th.innerHTML = tableHeader[h];
+        trHead.appendChild(th);
+    }
+    
     document.getElementById("chartOutput").appendChild(table);
+    adjustTable();
+}
+
+function adjustTable() {
+    var script = document.createElement('script');
+//    script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
+//    script.type = 'text/javascript';
+    $(document).ready(function() {
+//        $(tableOfOutput).ready(function() {
+            $('#tableOfOutput').DataTable();
+//        } );
+    });
 }

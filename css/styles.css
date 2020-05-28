@@ -276,6 +276,26 @@ p {
     left:50%;
 }
 
+/*
+#tablePages {
+    background-color:slategrey;
+    border:none;
+    color:floralwhite;
+    padding:8px;
+    outline:0;
+    border-radius:20px;
+    box-shadow:5px;
+    text-align:center;
+    align-items: center;
+    justify-content: center;
+    display:none;
+    margin: 10px -85px; 
+    position:relative;
+    top:50%; 
+    left:50%;
+}
+*/
+
 #badTrackButtonContainer {
     text-align:center;
     align-items: center;

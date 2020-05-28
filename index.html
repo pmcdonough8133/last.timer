@@ -8,11 +8,13 @@
     <meta name="description" content="Time based sorted charts for last.fm users">
     <meta name="author" content="IAmTheBlackMetal">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="css/styles.css?v=1.0">
 <!--    <link rel="stylesheet" href="sort-table.min.css">-->
     <script type="text/javascript" src="js/main.js"></script>
 <!--    <script src="sort-table.js"></script>-->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     
 </head>
 
@@ -53,13 +55,16 @@
                     <option value=25>Top 25</option>
                     <option value=50>Top 50</option>
                     <option value=100>Top 100</option>
-                    <option value=200>Top 200</option>
+                    <option value=500>Top 500</option>
+                    <option value=1000>Top 1000</option>
                 </select>
                 <br>
                 <br>
                 <input type="button" name="submit" value="Generate Charts" id="Submit" onClick="createCharts();">
             </form>
         </div>
+        
+<!--        <button id="tablePages" class="button">Switch to table with pages</button>-->
         
         <!-- Content -->
 <!--        <h3></h3>-->
@@ -143,16 +148,12 @@
         }
     }
     </script>
-    <!-- Bootstrap -->
-<!--
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-       $(document).ready(function () {
-           $('#tableOfOutput').DataTable();
-       });
+    <script>
+        $(document).ready(function() {
+            $(tableOfOutput).ready(function() {
+                $('#tableOfOutput').DataTable();
+            } );
+        });
     </script>
--->
 </body>
 </html>
