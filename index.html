@@ -34,10 +34,8 @@
                 <br>
                 <select name="metric" id="chartMetric">
                     <option value="artist">Artists</option>
-<!--
-                    <option value="album">Albums</option>
+<!--                    <option value="album">Albums</option>-->
                     <option value="track">Tracks</option>
--->
                 </select>
 
                 <select name="timeframe" id="chartTimeframe">
@@ -49,6 +47,7 @@
                     <option value="overall">Overall</option>
                 </select>
 
+<!--
                 <select name="size" id="chartSize">
                     <option value=8>Top 8</option>
                     <option value=16>Top 16</option>
@@ -58,6 +57,7 @@
                     <option value=500>Top 500</option>
                     <option value=1000>Top 1000</option>
                 </select>
+-->
                 <br>
                 <br>
                 <input type="button" name="submit" value="Generate Charts" id="Submit" onClick="createCharts();">
@@ -106,7 +106,7 @@
 -->
         <div id="footer">
             <ul>
-                <a href="http://www.Last.fm/user/IAmThBlackMetal">IAmtheBlackMetal (Creator)</a>
+                <a href="http://www.Last.fm/user/IAmThBlackMetal">IAmTheBlackMetal (Creator)</a>
                 |
                 <a href="mailto:p.mcdonough8133@gmail.com">Contact</a>
             </ul>
@@ -118,7 +118,7 @@
                 </span>
             </div>
 -->
-            <p id="detailsParagraph">This application is calculated using the last.fm time data.  It can be a semi-common occurence where tracks do not have time data listed.  This is either caused by poor meta data (ex: Remastered, Studio Version, Remix, etc. in the Track title) or simply from a lack of data. Last.fm gathers metadata for track length from musicbrainz so if you would like to help improve the accuracy of this tool, you can update the data on musicbrainz and wait for last.fm to grab the updated data. Fixing your own metadata will also improve your useage of this tool.</p>
+            <p id="detailsParagraph">This application is calculated using the last.fm time data.  It can be a semi-common occurence where tracks do not have time data listed.  This is either caused by poor meta data (ex: Remastered, Studio Version, Remix, etc. in the Track title) or simply from a lack of data. Last.fm gathers metadata for track length from musicbrainz and other sources so if you would like to help improve the accuracy of this tool, you can update the data on musicbrainz and wait for last.fm to grab the updated data. Fixing your own metadata will also improve your useage of this tool. NOTE: The button to display tracks with no time data will not work for the tracks option as those tracks without data will simply appear in the table.</p>
         </div>
     </div>
     <script>

@@ -9,13 +9,15 @@ var promises;
 var fiveHundredAlert = 1
 
 function createCharts() {
+    fiveHundredAlert = 1
     chartOutput = document.getElementById("chartOutput")
     durationDict = [];
     tracksWithNoTime = [];
     lastfmUsername = document.getElementById("usernameInput").value;
     lastfmMetric = document.getElementById("chartMetric").value;
     lastfmTimeframe = document.getElementById("chartTimeframe").value;
-    lastfmReturnLimit = document.getElementById("chartSize").value;
+    lastfmReturnLimit = "1000"
+//    lastfmReturnLimit = document.getElementById("chartSize").value;
 //    console.log(lastfmUsername,lastfmMetric,lastfmTimeframe,lastfmReturnLimit)
     
     if (lastfmMetric == "artist"){
@@ -99,6 +101,31 @@ function createCharts() {
         });
     } else if (lastfmMetric == "album") {
         console.log("to be done later")
+    } else if (lastfmMetric == "track") {
+        document.getElementById("loadingMessages").innerHTML = "Collecting Tracks..."
+        gatherTracks(null).then(function () {
+            document.getElementById("loadingMessages").innerHTML = ""
+            chartOutput.innerHTML = ""
+            durationDict.sort(function(a, b){
+                return b.duration - a.duration;
+            });
+            for(var z = 0; z < durationDict.length; z++) {
+                durationDict[z].playtimeRank = z+1;
+            }
+            durationDict.forEach(function(entry) {
+//                    console.log(entry);
+                entry.durHours = Math.floor(entry.duration/3600);
+                entry.durMinutes = Math.floor((entry.duration-entry.durHours*3600)/60);
+                entry.durSeconds = entry.duration-entry.durHours*3600-entry.durMinutes*60;
+//                    chartOutput.innerHTML += entry.artistName + ": " + entry.durHours + ":" + entry.durMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + entry.durSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + " playtime across "+entry.playcount+" plays<br>";
+            });
+            createTrackTable(durationDict);
+//                console.log("These tracks have no time data: ",tracksWithNoTime);
+            tracksWithNoTime.sort();
+            document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data.<br>"+tracksWithNoTime.join("<br>") + "<br>";
+            document.getElementById("badDataButton").style.display = "block";
+//                document.getElementById("tablePages").style.display = "block";
+        });
     }
     
   
@@ -171,7 +198,21 @@ function gatherTracksPerPage(listofNames, currentPage) {
             try {
                 for (var i = 0; i < data.toptracks.track.length; i++) {
     //                console.log("working on track "+i);
-                    if (listofNames.includes(data.toptracks.track[i].artist.name)) {
+                    if (listofNames == null) {
+                        var tempDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration
+                        durationDict.push({
+                            trackName:data.toptracks.track[i].name,
+                            artistName:data.toptracks.track[i].artist.name,
+                            duration:tempDuration,
+                            durHours:null,
+                            durMinutes:null,
+                            durSeconds:null,
+                            playcount:Number(data.toptracks.track[i].playcount),
+                            playtimeRank:null,
+                            playcountRank:i+1,
+                            emptyTracks:0
+                        });
+                    } else if (listofNames.includes(data.toptracks.track[i].artist.name)) {
                         for (var d = 0; d < durationDict.length; d++) {
                             if (durationDict[d].artistName == data.toptracks.track[i].artist.name) {
                                 var addDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration;
@@ -257,6 +298,73 @@ function createArtistTable(dataDictionary) {
         var tdTrackAvg = document.createElement('td');
         tdTrackAvg = tr.insertCell(-1);
         tdTrackAvg.innerHTML = averageTrackLengthMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + averageTrackLengthSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+    }
+    
+    var header = table.createTHead();
+    var trHead = header.insertRow(0);
+    for (var h = 0; h < tableHeader.length; h++) {
+        var th = document.createElement('th');
+        th.innerHTML = tableHeader[h];
+        trHead.appendChild(th);
+    }
+    
+    document.getElementById("chartOutput").appendChild(table);
+    adjustTable();
+}
+
+function createTrackTable(dataDictionary) {
+//    console.log(dataDictionary);
+    document.getElementById("chartOutput").innerHTML = ""
+    var table = document.createElement('table');
+    table.setAttribute('id', 'tableOfOutput');
+    table.setAttribute('class', 'display')
+    table.setAttribute('style', 'width:100%')
+    var tableHeader = ["Time Rank", "Track", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change"];
+    
+    var tr;
+    for (var c = 0; c < dataDictionary.length; c++) {
+        tr = table.insertRow();
+        
+        var tdTimeRank = document.createElement('td');
+        tdTimeRank = tr.insertCell();
+        tdTimeRank.innerHTML = dataDictionary[c].playtimeRank;
+        
+        var tdTrack = document.createElement('td');
+        tdTrack = tr.insertCell();
+        tdTrack.innerHTML = dataDictionary[c].trackName;
+        
+        var tdArtist = document.createElement('td');
+        tdArtist = tr.insertCell();
+        tdArtist.innerHTML = dataDictionary[c].artistName;
+        
+        var tdPlaytime = document.createElement('td');
+        tdPlaytime = tr.insertCell();
+        tdPlaytime.innerHTML = dataDictionary[c].durHours + ":" + dataDictionary[c].durMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + dataDictionary[c].durSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+        
+        var tdPlaycount = document.createElement('td');
+        tdPlaycount = tr.insertCell();
+        tdPlaycount.innerHTML = dataDictionary[c].playcount;
+        
+        var tdPlayRank = document.createElement('td');
+        tdPlayRank = tr.insertCell();
+        tdPlayRank.innerHTML = dataDictionary[c].playcountRank;
+        
+        var rankChange = Number(dataDictionary[c].playcountRank-dataDictionary[c].playtimeRank)
+        var tdRankChange = document.createElement('td');
+        tdRankChange = tr.insertCell();
+        if (rankChange > 0) {
+            tdRankChange.innerHTML = "+"+String(rankChange);
+        } else {
+            tdRankChange.innerHTML = String(rankChange);
+        }
+        
+//        var averageTrackLength = dataDictionary[c].duration/(dataDictionary[c].playcount - dataDictionary[c].emptyTracks);
+//        var averageTrackLengthMinutes = Math.floor(averageTrackLength/60);
+//        var averageTrackLengthSeconds = Math.round(averageTrackLength-averageTrackLengthMinutes*60);
+////        console.log("Average Track Length: "+averageTrackLength,"Minutes: "+averageTrackLengthMinutes,"Seconds: "+averageTrackLengthSeconds)
+//        var tdTrackAvg = document.createElement('td');
+//        tdTrackAvg = tr.insertCell(-1);
+//        tdTrackAvg.innerHTML = averageTrackLengthMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + averageTrackLengthSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
     }
     
     var header = table.createTHead();
