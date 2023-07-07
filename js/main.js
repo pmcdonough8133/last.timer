@@ -7,6 +7,7 @@ var chartOutput;
 var tracksWithNoTime;
 var promises;
 var fiveHundredAlert = 1
+var apiKey = config.apiKey
 
 function createCharts() {
     fiveHundredAlert = 1
@@ -25,7 +26,7 @@ function createCharts() {
 //        var artistDuration = [];
         var artistsList = [];
         var promiseArtist = new Promise(function(resolve, reject) {
-            var restAPIcall = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=" + lastfmReturnLimit + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
+            var restAPIcall = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=" + lastfmReturnLimit + "&api_key=" + apiKey + "&format=json";//bc139a6bdeaa921ed70e49ca9a21f683
             var request = new XMLHttpRequest();
             request.onreadystatechange=function() {
                 if (request.readyState === 4) {
@@ -134,7 +135,7 @@ function createCharts() {
 
 function gatherTracks(listofNamesTemp) {
     return new Promise (function(resolve) {
-        var restAPIcallTwo = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=1&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
+        var restAPIcallTwo = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=1&api_key=" + apiKey + "&format=json";//bc139a6bdeaa921ed70e49ca9a21f683
         var totalPageLimit;
         promises = [];
         var requestTwo = new XMLHttpRequest();
@@ -172,7 +173,7 @@ function gatherTracks(listofNamesTemp) {
 
 function gatherTracksPerPage(listofNames, currentPage) {
     return new Promise (function(resolve) {
-        var restAPIcallThree = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=" + currentPage + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
+        var restAPIcallThree = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=" + currentPage + "&api_key=" + apiKey + "&format=json";//bc139a6bdeaa921ed70e49ca9a21f683
         var requestThree = new XMLHttpRequest();
         requestThree.onreadystatechange=function() {
             if (requestThree.readyState === 4) {
