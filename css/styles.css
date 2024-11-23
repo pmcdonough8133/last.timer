@@ -32,9 +32,9 @@ a {
 }
 
 #page-wrap { 
-    min-width:725px;
-    width:60%;
-    padding:40px 60px;
+    min-width:825px;
+    width:85%;
+    padding:10px 50px;
     margin:0 auto
 }
 
@@ -340,15 +340,19 @@ th:nth-child(4) {
 }
 
 th:nth-child(5) {
-  width: 10%;
+  width: 9%;
 }
 
 th:nth-child(6) {
-  width: 10%;
+  width: 9%;
 }
 
 th:nth-child(7) {
-  width: 12%;
+  width: 11%;
+}
+
+th:nth-child(8) {
+  width: 6%;
 }
 
 th {

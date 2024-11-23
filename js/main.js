@@ -94,7 +94,7 @@ function createCharts() {
                 createArtistTable(durationDict);
 //                console.log("These tracks have no time data: ",tracksWithNoTime);
                 tracksWithNoTime.sort();
-                document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data.<br>"+tracksWithNoTime.join("<br>") + "<br>";
+                document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data. <br><b>Estimated Playtime uses the track average to account for these if possible.</b><br>"+tracksWithNoTime.join("<br>") + "<br>";
                 document.getElementById("badDataButton").style.display = "block";
 //                document.getElementById("tablePages").style.display = "block";
             });
@@ -204,6 +204,7 @@ function gatherTracksPerPage(listofNames, currentPage) {
                             trackName:data.toptracks.track[i].name,
                             artistName:data.toptracks.track[i].artist.name,
                             duration:tempDuration,
+                            trackDuration:data.toptracks.track[i].duration,
                             durHours:null,
                             durMinutes:null,
                             durSeconds:null,
@@ -256,7 +257,7 @@ function createArtistTable(dataDictionary) {
     table.setAttribute('id', 'tableOfOutput');
     table.setAttribute('class', 'display')
     table.setAttribute('style', 'width:100%')
-    var tableHeader = ["Time Rank", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change", "Avg Track Length"];
+    var tableHeader = ["Time Rank", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change", "Avg Track Length","Estimated Playtime"];
     
     var tr;
     for (var c = 0; c < dataDictionary.length; c++) {
@@ -291,13 +292,22 @@ function createArtistTable(dataDictionary) {
             tdRankChange.innerHTML = String(rankChange);
         }
         
-        var averageTrackLength = dataDictionary[c].duration/(dataDictionary[c].playcount - dataDictionary[c].emptyTracks);
-        var averageTrackLengthMinutes = Math.floor(averageTrackLength/60);
-        var averageTrackLengthSeconds = Math.round(averageTrackLength-averageTrackLengthMinutes*60);
+        var averageTrackLength = dataDictionary[c].duration/(dataDictionary[c].playcount - dataDictionary[c].emptyTracks) || 0;
+        var averageTrackLengthHours = Math.floor(averageTrackLength/3600);
+        var averageTrackLengthMinutes = Math.floor((averageTrackLength-averageTrackLengthHours*3600)/60);
+        var averageTrackLengthSeconds = Math.round(averageTrackLength-averageTrackLengthHours*3600-averageTrackLengthMinutes*60);
 //        console.log("Average Track Length: "+averageTrackLength,"Minutes: "+averageTrackLengthMinutes,"Seconds: "+averageTrackLengthSeconds)
         var tdTrackAvg = document.createElement('td');
         tdTrackAvg = tr.insertCell(-1);
-        tdTrackAvg.innerHTML = averageTrackLengthMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + averageTrackLengthSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+        tdTrackAvg.innerHTML = ((averageTrackLengthHours == 0) ? "" : averageTrackLengthHours + ":") + averageTrackLengthMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + averageTrackLengthSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+        
+        var estPlaytime = dataDictionary[c].duration+dataDictionary[c].emptyTracks * averageTrackLength
+        var estPlaytimeHours = Math.floor(estPlaytime/3600);
+        var estPlaytimeMinutes = Math.floor((estPlaytime-estPlaytimeHours*3600)/60);
+        var estPlaytimeSeconds = Math.round(estPlaytime-estPlaytimeHours*3600-estPlaytimeMinutes*60);
+        var tdEstPlaytime = document.createElement('td');
+        tdEstPlaytime = tr.insertCell(-1);
+        tdEstPlaytime.innerHTML = ((estPlaytimeHours == 0) ? "" : estPlaytimeHours + ":") + estPlaytimeMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + estPlaytimeSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
     }
     
     var header = table.createTHead();
@@ -319,7 +329,7 @@ function createTrackTable(dataDictionary) {
     table.setAttribute('id', 'tableOfOutput');
     table.setAttribute('class', 'display')
     table.setAttribute('style', 'width:100%')
-    var tableHeader = ["Time Rank", "Track", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change"];
+    var tableHeader = ["Time Rank", "Track", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change","Track Length"];
     
     var tr;
     for (var c = 0; c < dataDictionary.length; c++) {
@@ -357,6 +367,13 @@ function createTrackTable(dataDictionary) {
         } else {
             tdRankChange.innerHTML = String(rankChange);
         }
+        
+        var tdTrackLength = document.createElement('td');
+        tdTrackLength = tr.insertCell();
+        var trackHours = Math.floor(dataDictionary[c].trackDuration/3600);
+        var trackMinutes = Math.floor((dataDictionary[c].trackDuration-trackHours*3600)/60);
+        var trackSeconds = dataDictionary[c].trackDuration-trackHours*3600-trackMinutes*60;
+        tdTrackLength.innerHTML = trackHours + ":" + trackMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + trackSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
         
 //        var averageTrackLength = dataDictionary[c].duration/(dataDictionary[c].playcount - dataDictionary[c].emptyTracks);
 //        var averageTrackLengthMinutes = Math.floor(averageTrackLength/60);
