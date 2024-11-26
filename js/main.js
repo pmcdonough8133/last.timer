@@ -161,10 +161,10 @@ function gatherTracks(listofNamesTemp) {
 //            console.log("Total Pages = "+totalPageLimit);
 //            var totalTracks = data.toptracks['@attr'].total;
             for (var j = 1; j < totalPageLimit+1; j++) {
-                if (totalPageLimit > 60) {
-                    var timeDelay = Math.floor(Math.pow(Math.random(), 2) * 2000 * j)
-                    setTimeout(console.log("delaying calls "+String( timeDelay)),timeDelay)
-                }
+//                if (totalPageLimit > 60) {
+//                    var timeDelay = Math.floor(Math.pow(Math.random(), 2) * 2000 * j)
+//                    setTimeout(console.log("delaying calls "+String( timeDelay)),timeDelay)
+//                }
                 promises.push(gatherTracksPerPage(listofNamesTemp, j));
             }
             promiseProgress(promises,function(results) {
@@ -295,12 +295,12 @@ function gatherTPPrequest(requestVar,currentPage,retryCounter){
                 if (requestThree.status === 200) {
                     // do nothing
                 } else {
-                    console.log("Last.fm returned "+requestThree.status+" error. Page "+currentPage+" was lost. Trying again for more accurate results.");
+//                    console.log("Last.fm returned "+requestThree.status+" error. Page "+currentPage+" was lost. Trying again for more accurate results.");
                     if (requestThree.status === 500) {
-                        if (fiveHundredAlert > 0) {
-                            fiveHundredAlert--
-                            alert("This app has encountered Internal Service Errors from Last.fm, it will try to complete but it may lose some data.  Check the playcounts for accuracy, re-run to try again.")
-                        }
+//                        if (fiveHundredAlert > 0) {
+//                            fiveHundredAlert--
+//                            alert("This app has encountered Internal Service Errors from Last.fm, it will try to complete but it may lose some data.  Check the playcounts for accuracy, re-run to try again.")
+//                        }
                         reject('Failed')
                     }
                 }
@@ -315,7 +315,7 @@ function gatherTPPrequest(requestVar,currentPage,retryCounter){
     }).catch(function(message) {
         if (retryCounter > 0){
             retryCounter--
-            setTimeout(console.log("delaying retry calls 20 seconds"),20000)
+//            setTimeout(console.log("delaying retry calls 20 seconds"),20000)
             return gatherTPPrequest(requestVar,currentPage,retryCounter)
         } else {
             console.log("Last.fm returned "+requestThree.status+" error. Page "+currentPage+" was lost for good.")
@@ -499,6 +499,10 @@ function adjustTable() {
 //        } );
     });
     if (lostPages.length >0 ) {
+        if (fiveHundredAlert > 0) {
+            fiveHundredAlert--
+            alert("This app has encountered Internal Service Errors from Last.fm and lost data. Please try re-running to ensure accurate data.")
+        }
         console.log("All lost pages")
         console.log(lostPages)
     }
@@ -520,6 +524,10 @@ function adjustTableArtist() {
 //        } );
     });
     if (lostPages.length >0 ) {
+        if (fiveHundredAlert > 0) {
+            fiveHundredAlert--
+            alert("This app has encountered Internal Service Errors from Last.fm and lost data. Please try re-running to ensure accurate data")
+        }
         console.log("All lost pages")
         console.log(lostPages)
     }
