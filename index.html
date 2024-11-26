@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en">
 <head>
@@ -15,6 +15,7 @@
 <!--    <script src="sort-table.js"></script>-->
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/2.1.8/sorting/time.js"></script>
     
 </head>
 
@@ -29,7 +30,7 @@
         <div id="form-holder">
             <form class="timeChart" action="#" id="myForm" onsubmit="createCharts();" method="get">
                 <br>
-                <input type="text" name="user" id="usernameInput" placeholder="Last.fm username..." pattern="[A-Za-z0-9_-]{2,25}" autofocus="" required="">
+                <input type="text" name="user" id="usernameInput" placeholder="Last.fm username..." pattern="[A-Za-z0-9_\-]{2,25}" autofocus="" required="">
                 <br>
                 <br>
                 <select name="metric" id="chartMetric">
@@ -150,9 +151,8 @@
     </script>
     <script>
         $(document).ready(function() {
-            $(tableOfOutput).ready(function() {
-                $('#tableOfOutput').DataTable();
-            } );
+                $('#tableOfOutput').DataTable( {
+                });
         });
     </script>
 </body>
