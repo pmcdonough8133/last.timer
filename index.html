@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    
+
     <title>Last.fm Time Charts</title>
     <meta name="description" content="Time based sorted charts for last.fm users">
     <meta name="author" content="IAmTheBlackMetal">
@@ -16,16 +16,16 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/2.1.8/sorting/time.js"></script>
-    
+
 </head>
 
 <body>
     <div id="page-wrap">
-        
+
         <!-- Header -->
         <h1>Last.fm Time Charts</h1>
         <h2>Ever want to see your charts sorted by playtime instead of playcount?<br>Well now you can!</h2>
-        
+
         <!-- Form -->
         <div id="form-holder">
             <form class="timeChart" action="#" id="myForm" onsubmit="createCharts();" method="get">
@@ -64,9 +64,9 @@
                 <input type="button" name="submit" value="Generate Charts" id="Submit" onClick="createCharts();">
             </form>
         </div>
-        
+
 <!--        <button id="tablePages" class="button">Switch to table with pages</button>-->
-        
+
         <!-- Content -->
 <!--        <h3></h3>-->
 <!--        <p></p>-->
@@ -93,6 +93,7 @@
         </div>
         <div id="badTrackButtonContainer">
             <button id="badDataButton" class="button">Check for Tracks with no time data</button>
+            <button id="exportCSVButton" class="button" onClick="download_table_as_csv('tableOfOutput')">Export as CSV</button>
         </div>
 <!--
         <div id="chartOutput">
@@ -140,9 +141,9 @@
         popUp.style.display = "none";
       }
     }
-    
+
     document.getElementById("myForm").onkeypress = function(e) {
-        var key = e.charCode || e.keyCode || 0;     
+        var key = e.charCode || e.keyCode || 0;
         if (key == 13) {
             createCharts();
             e.preventDefault();

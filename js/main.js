@@ -98,6 +98,7 @@ function createCharts() {
                 tracksWithNoTime.sort();
                 document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data. <br><b>Estimated Playtime uses the track average to account for these if possible.</b><br>"+tracksWithNoTime.join("<br>") + "<br>";
                 document.getElementById("badDataButton").style.display = "block";
+                document.getElementById("exportCSVButton").style.display = "block";
 //                document.getElementById("tablePages").style.display = "block";
             });
         });
@@ -126,6 +127,7 @@ function createCharts() {
             tracksWithNoTime.sort();
             document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data.<br>"+tracksWithNoTime.join("<br>") + "<br>";
             document.getElementById("badDataButton").style.display = "block";
+            document.getElementById("exportCSVButton").style.display = "block";
 //                document.getElementById("tablePages").style.display = "block";
         });
     }
