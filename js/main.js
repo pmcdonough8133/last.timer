@@ -21,7 +21,7 @@ function createCharts() {
     lastfmReturnLimit = "1000"
 //    lastfmReturnLimit = document.getElementById("chartSize").value;
 //    console.log(lastfmUsername,lastfmMetric,lastfmTimeframe,lastfmReturnLimit)
-    
+
     if (lastfmMetric == "artist"){
         document.getElementById("loadingMessages").innerHTML = "Gathering artists..."
 //        var artistDuration = [];
@@ -74,7 +74,7 @@ function createCharts() {
             }
             request.send();
         });
-        
+
         promiseArtist.then(function () {
             document.getElementById("loadingMessages").innerHTML = "Collecting Tracks..."
             gatherTracks(artistsList).then(function () {
@@ -129,11 +129,11 @@ function createCharts() {
 //                document.getElementById("tablePages").style.display = "block";
         });
     }
-    
-    
-    
-  
-  
+
+
+
+
+
 }
 
 function gatherTracks(listofNamesTemp) {
@@ -171,7 +171,7 @@ function gatherTracks(listofNamesTemp) {
                 document.getElementById("loadingMessages").innerHTML = "Calculating Track durations... Completed pages "+results+" out of "+totalPageLimit;
             })
             Promise.all(promises).then(function(results) {
-               resolve(); 
+               resolve();
             });
         }
         requestTwo.send();
@@ -322,7 +322,7 @@ function gatherTPPrequest(requestVar,currentPage,retryCounter){
             lostPages.push(currentPage)
             return []
         }
-        
+
     })
 }
 
@@ -346,31 +346,31 @@ function createArtistTable(dataDictionary) {
     table.setAttribute('class', 'display')
     table.setAttribute('style', 'width:100%')
     var tableHeader = ["Time Rank", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change", "Avg Track Length","Estimated Playtime"];
-    
+
     var tr;
     for (var c = 0; c < dataDictionary.length; c++) {
         tr = table.insertRow();
-        
+
         var tdTimeRank = document.createElement('td');
         tdTimeRank = tr.insertCell();
         tdTimeRank.innerHTML = dataDictionary[c].playtimeRank;
-        
+
         var tdArtist = document.createElement('td');
         tdArtist = tr.insertCell();
         tdArtist.innerHTML = dataDictionary[c].artistName;
-        
+
         var tdPlaytime = document.createElement('td');
         tdPlaytime = tr.insertCell();
         tdPlaytime.innerHTML = dataDictionary[c].durHours + ":" + dataDictionary[c].durMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + dataDictionary[c].durSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
-        
+
         var tdPlaycount = document.createElement('td');
         tdPlaycount = tr.insertCell();
         tdPlaycount.innerHTML = dataDictionary[c].playcount;
-        
+
         var tdPlayRank = document.createElement('td');
         tdPlayRank = tr.insertCell();
         tdPlayRank.innerHTML = dataDictionary[c].playcountRank;
-        
+
         var rankChange = Number(dataDictionary[c].playcountRank-dataDictionary[c].playtimeRank)
         var tdRankChange = document.createElement('td');
         tdRankChange = tr.insertCell();
@@ -379,7 +379,7 @@ function createArtistTable(dataDictionary) {
         } else {
             tdRankChange.innerHTML = String(rankChange);
         }
-        
+
         var averageTrackLength = dataDictionary[c].duration/(dataDictionary[c].playcount - dataDictionary[c].emptyTracks) || 0;
         var averageTrackLengthHours = Math.floor(averageTrackLength/3600);
         var averageTrackLengthMinutes = Math.floor((averageTrackLength-averageTrackLengthHours*3600)/60);
@@ -388,7 +388,7 @@ function createArtistTable(dataDictionary) {
         var tdTrackAvg = document.createElement('td');
         tdTrackAvg = tr.insertCell(-1);
         tdTrackAvg.innerHTML = ((averageTrackLengthHours == 0) ? "" : averageTrackLengthHours + ":") + averageTrackLengthMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + averageTrackLengthSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
-        
+
         var estPlaytime = dataDictionary[c].duration+dataDictionary[c].emptyTracks * averageTrackLength
         var estPlaytimeHours = Math.floor(estPlaytime/3600);
         var estPlaytimeMinutes = Math.floor((estPlaytime-estPlaytimeHours*3600)/60);
@@ -397,7 +397,7 @@ function createArtistTable(dataDictionary) {
         tdEstPlaytime = tr.insertCell(-1);
         tdEstPlaytime.innerHTML = ((estPlaytimeHours == 0) ? "" : estPlaytimeHours + ":") + estPlaytimeMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + estPlaytimeSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
     }
-    
+
     var header = table.createTHead();
     var trHead = header.insertRow(0);
     for (var h = 0; h < tableHeader.length; h++) {
@@ -405,9 +405,11 @@ function createArtistTable(dataDictionary) {
         th.innerHTML = tableHeader[h];
         trHead.appendChild(th);
     }
-    
+
     document.getElementById("chartOutput").appendChild(table);
     adjustTableArtist();
+
+    //download_table_as_csv("tableOfOutput");
 }
 
 function createTrackTable(dataDictionary) {
@@ -418,35 +420,35 @@ function createTrackTable(dataDictionary) {
     table.setAttribute('class', 'display')
     table.setAttribute('style', 'width:100%')
     var tableHeader = ["Time Rank", "Track", "Artist", "Playtime", "Playcount", "Plays Rank", "Rank Change","Track Length"];
-    
+
     var tr;
     for (var c = 0; c < dataDictionary.length; c++) {
         tr = table.insertRow();
-        
+
         var tdTimeRank = document.createElement('td');
         tdTimeRank = tr.insertCell();
         tdTimeRank.innerHTML = dataDictionary[c].playtimeRank;
-        
+
         var tdTrack = document.createElement('td');
         tdTrack = tr.insertCell();
         tdTrack.innerHTML = dataDictionary[c].trackName;
-        
+
         var tdArtist = document.createElement('td');
         tdArtist = tr.insertCell();
         tdArtist.innerHTML = dataDictionary[c].artistName;
-        
+
         var tdPlaytime = document.createElement('td');
         tdPlaytime = tr.insertCell();
         tdPlaytime.innerHTML = dataDictionary[c].durHours + ":" + dataDictionary[c].durMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + dataDictionary[c].durSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
-        
+
         var tdPlaycount = document.createElement('td');
         tdPlaycount = tr.insertCell();
         tdPlaycount.innerHTML = dataDictionary[c].playcount;
-        
+
         var tdPlayRank = document.createElement('td');
         tdPlayRank = tr.insertCell();
         tdPlayRank.innerHTML = dataDictionary[c].playcountRank;
-        
+
         var rankChange = Number(dataDictionary[c].playcountRank-dataDictionary[c].playtimeRank)
         var tdRankChange = document.createElement('td');
         tdRankChange = tr.insertCell();
@@ -455,14 +457,14 @@ function createTrackTable(dataDictionary) {
         } else {
             tdRankChange.innerHTML = String(rankChange);
         }
-        
+
         var tdTrackLength = document.createElement('td');
         tdTrackLength = tr.insertCell();
         var trackHours = Math.floor(dataDictionary[c].trackDuration/3600);
         var trackMinutes = Math.floor((dataDictionary[c].trackDuration-trackHours*3600)/60);
         var trackSeconds = dataDictionary[c].trackDuration-trackHours*3600-trackMinutes*60;
         tdTrackLength.innerHTML = trackHours + ":" + trackMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + trackSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
-        
+
 //        var averageTrackLength = dataDictionary[c].duration/(dataDictionary[c].playcount - dataDictionary[c].emptyTracks);
 //        var averageTrackLengthMinutes = Math.floor(averageTrackLength/60);
 //        var averageTrackLengthSeconds = Math.round(averageTrackLength-averageTrackLengthMinutes*60);
@@ -471,7 +473,7 @@ function createTrackTable(dataDictionary) {
 //        tdTrackAvg = tr.insertCell(-1);
 //        tdTrackAvg.innerHTML = averageTrackLengthMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + ":" + averageTrackLengthSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
     }
-    
+
     var header = table.createTHead();
     var trHead = header.insertRow(0);
     for (var h = 0; h < tableHeader.length; h++) {
@@ -479,9 +481,11 @@ function createTrackTable(dataDictionary) {
         th.innerHTML = tableHeader[h];
         trHead.appendChild(th);
     }
-    
+
     document.getElementById("chartOutput").appendChild(table);
     adjustTable();
+
+    //download_table_as_csv("tableOfOutput");
 }
 
 function adjustTable() {
@@ -531,5 +535,37 @@ function adjustTableArtist() {
         console.log("All lost pages")
         console.log(lostPages)
     }
-        
+
+}
+
+// Adapted from https://stackoverflow.com/questions/15547198/export-html-table-to-csv-using-vanilla-javascript
+function download_table_as_csv(table_id, separator = ',') {
+  lastfmUsername = document.getElementById("usernameInput").value;
+  lastfmMetric = document.getElementById("chartMetric").value;
+  lastfmTimeframe = document.getElementById("chartTimeframe").value;
+
+  var rows = document.querySelectorAll('table#' + table_id + ' tr');
+  var csv = [];
+  for (var i = 0; i < rows.length; i++) {
+      var row = [], cols = rows[i].querySelectorAll('td, th');
+      for (var j = 0; j < cols.length; j++) {
+          // Clean innertext to remove multiple spaces and jumpline (break csv)
+          var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
+          // Escape double-quote with double-double-quote (see https://stackoverflow.com/questions/17808511/properly-escape-a-double-quote-in-csv)
+          data = data.replace(/"/g, '""');
+          // Push escaped string
+          row.push('"' + data + '"');
+      }
+      csv.push(row.join(separator));
+  }
+  var csv_string = csv.join('\n');
+  var filename = `${lastfmUsername}_${lastfmMetric}s_${lastfmTimeframe}.csv`;
+  var link = document.createElement('a');
+  link.style.display = 'none';
+  link.setAttribute('target', '_blank');
+  link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string));
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
