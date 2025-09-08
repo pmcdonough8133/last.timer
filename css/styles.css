@@ -313,6 +313,7 @@ p {
     justify-content: center;
     align-self: center;
     margin-bottom: 1em;
+    margin-top: 1em;
 }
 
 .button:hover {
@@ -473,4 +474,8 @@ tr:nth-child(even) {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.dt-info {
+  margin-top: 1em !important;
 }

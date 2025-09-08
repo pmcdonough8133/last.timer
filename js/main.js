@@ -601,10 +601,6 @@ function download_table_as_csv(table_id, separator = ',') {
   var rows = document.querySelectorAll('table#' + table_id + ' tr');
   var csv = [];
 
-  // let table = new DataTable("#tableOfOutput");
-  // var data = table.buttons.exportData();
-  // console.log(data);
-
   for (var i = 0; i < rows.length; i++) {
       var row = [], cols = rows[i].querySelectorAll('td, th');
       for (var j = 0; j < cols.length; j++) {
