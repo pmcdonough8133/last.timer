@@ -2,19 +2,26 @@ var lastfmUsername;// = document.getElementById("usernameInput").value;
 var lastfmMetric;// = document.getElementById("chartMetric").value;
 var lastfmTimeframe;// = document.getElementById("chartTimeframe").value;
 var lastfmReturnLimit;// = document.getElementById("chartSize").value;
-var durationDict;// = []
-var chartOutput;
-var tracksWithNoTime;
+var durationDict;// The dictionary responsible for holding all the data as the application iterates and calculates.
+var chartOutput; // The variable where the chart itself is eventually stored.
+var tracksWithNoTime;// The dictionary responsible for holding the missing data as it is identified.
 var promises;
-var fiveHundredAlert = 1 // alert variable used to determine whether an alert should be sent if last.fm calls fail
-var lostPages;
+var fiveHundredAlert = 1 // alert variable used to determine whether an alert should be sent if last.fm calls fail.
+var lostPages; // Used for tracking lost pages when API errors occur.
 
+
+/**
+* Baseline function that kicks everything off.
+* It is the function called by the "Generate Charts" button that starts the whole application.
+* Takes no parameters.
+* Instead uses getElementById methods to figure out the values to use.
+*/
 function createCharts() {
     fiveHundredAlert = 1 // Resetting the alert variable for each new attempt by user
     chartOutput = document.getElementById("chartOutput")
-    durationDict = [];
-    tracksWithNoTime = [];
-    lostPages = [];
+    durationDict = []; // Resets the main dictionary for a new run
+    tracksWithNoTime = []; // Resets the mising data dictionary for a new run
+    lostPages = []; // Resets the lost pages dictionary for a new run
     lastfmUsername = document.getElementById("usernameInput").value;
     lastfmMetric = document.getElementById("chartMetric").value;
     lastfmTimeframe = document.getElementById("chartTimeframe").value;
@@ -22,6 +29,9 @@ function createCharts() {
 //    lastfmReturnLimit = document.getElementById("chartSize").value;
 //    console.log(lastfmUsername,lastfmMetric,lastfmTimeframe,lastfmReturnLimit)
 
+    /**
+    * When the user selects Artists as the metric they want to calculate the time for
+    */
     if (lastfmMetric == "artist"){
         document.getElementById("loadingMessages").innerHTML = "Gathering artists..."
 //        var artistDuration = [];
@@ -98,12 +108,19 @@ function createCharts() {
                 tracksWithNoTime.sort();
                 document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data. <br><b>Estimated Playtime uses the track average to account for these if possible.</b><br>"+tracksWithNoTime.join("<br>") + "<br>";
                 document.getElementById("badDataButton").style.display = "block";
-                document.getElementById("exportCSVButton").style.display = "block";
+//                document.getElementById("exportCSVButton").style.display = "block"; //Not needed
 //                document.getElementById("tablePages").style.display = "block";
             });
         });
+    /**
+    * When the user selects Albums as the metric they want to calculate the time for
+    * CURRENTLY NOT USED, WILL NEED A FULL DATABASE BACKEND TO WORK
+    */
     } else if (lastfmMetric == "album") {
         console.log("to be done later")
+    /**
+    * When the user selects Tracks as the metric they want to calculate the time for
+    */
     } else if (lastfmMetric == "track") {
         document.getElementById("loadingMessages").innerHTML = "Collecting Tracks..."
         gatherTracks(null).then(function () {
@@ -127,7 +144,7 @@ function createCharts() {
             tracksWithNoTime.sort();
             document.getElementById("popUpBox").innerHTML = "There are "+tracksWithNoTime.length+" track(s) with no time data.<br>"+tracksWithNoTime.join("<br>") + "<br>";
             document.getElementById("badDataButton").style.display = "block";
-            document.getElementById("exportCSVButton").style.display = "block";
+//            document.getElementById("exportCSVButton").style.display = "block"; //Not needed
 //                document.getElementById("tablePages").style.display = "block";
         });
     }
@@ -138,6 +155,13 @@ function createCharts() {
 
 }
 
+/**
+* Function to organize collection of individual tracks from last.fm
+* Mainly does a simple call to gather page limit and checks for returned API errors.
+* Passes onto helper function gatherTracksPerPage and tracks progress to display to user.
+* Takes one parameter.
+* listofNamesTemp: Expects a list of artist names generated from the user's top artists call
+*/
 function gatherTracks(listofNamesTemp) {
     return new Promise (function(resolve) {
         var restAPIcallTwo = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=1&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
@@ -151,7 +175,7 @@ function gatherTracks(listofNamesTemp) {
                 } else {
                     console.log("Last.fm returned "+requestTwo.status+" error on page check.");
                     if (requestTwo.status === 500) {
-                        gatherTracks(listofNamesTemp)
+                        gatherTracks(listofNamesTemp) // Retry
                     }
                 }
             }
@@ -180,6 +204,13 @@ function gatherTracks(listofNamesTemp) {
     });
 }
 
+/**
+* Function to handle collection of individual tracks from last.fm on a per page basis
+* Collects data from last.fm user top tracks calls and stores into dictionary
+* Takes two parameters.
+* listofNames: Expects a list of artist names passed along by the parent function
+* currentPage: Expects an integer to indicate which page the function should call for gathering tracks
+*/
 function gatherTracksPerPage(listofNames, currentPage) {
     return new Promise (function(resolve) {
         var restAPIcallThree = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=" + currentPage + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
@@ -187,6 +218,9 @@ function gatherTracksPerPage(listofNames, currentPage) {
             try {
                 for (var i = 0; i < data.toptracks.track.length; i++) {
     //                console.log("working on track "+i);
+                    /**
+                    If the list of names is null, then this is being used for a top tracks generation and should just return the data as a track dictionary
+                    */
                     if (listofNames == null) {
                         var tempDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration
                         var curPagePlaycountRank = (Number(currentPage)-1)*1000
@@ -203,9 +237,12 @@ function gatherTracksPerPage(listofNames, currentPage) {
                             playcountRank:curPagePlaycountRank+i+1,
                             emptyTracks:0
                         });
-                    } else if (listofNames.includes(data.toptracks.track[i].artist.name)) {
+                    /**
+                    If the list of names is present, then this is being used for a top artist tracks generation and the track length is to be added to the artist dictionary's duration field multiplied by the number of plays alongside the playcount
+                    */
+                    } else { //if (listofNames.includes(data.toptracks.track[i].artist.name)) { 
                         for (var d = 0; d < durationDict.length; d++) {
-                            if (durationDict[d].artistName == data.toptracks.track[i].artist.name) {
+                            if (durationDict[d].artistName.toLowerCase() == data.toptracks.track[i].artist.name.toLowerCase()) {
                                 var addDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration;
                                 if (addDuration == 0 ) {
                                     tracksWithNoTime.push(data.toptracks.track[i].artist.name+" --- "+data.toptracks.track[i].name);
@@ -289,6 +326,14 @@ function gatherTracksPerPage(listofNames, currentPage) {
     });
 }
 
+/**
+* Helper function for gatherTracksPerPage to handle multiple attempts of calls to the last.fm API
+* Makes the url requests and handles errors
+* Takes three parameters.
+* requestVar: Expects a url for the last.fm API call
+* currentPage: Expects an integer to indicate which page the function should call for gathering tracks
+* retryCounter: Expects an integer to indicate the number of retries available counting down from 5
+*/
 function gatherTPPrequest(requestVar,currentPage,retryCounter){
     return new Promise(function(resolve, reject) {
         var requestThree = new XMLHttpRequest();
@@ -328,6 +373,12 @@ function gatherTPPrequest(requestVar,currentPage,retryCounter){
     })
 }
 
+/**
+* Helper function to track progress through use of promises
+* Takes two parameters.
+* proms: Expects a list of promises
+* progress: Expects a function to display the progress to the user
+*/
 function promiseProgress(proms, progress) {
     var d = 0;
     progress(0);
@@ -340,6 +391,11 @@ function promiseProgress(proms, progress) {
     return Promise.all(proms)
 }
 
+/**
+* Function to build out the display table from the artist dictionary 
+* Takes one parameter.
+* dataDictionary: Expects the artist dictionary built through the other functions
+*/
 function createArtistTable(dataDictionary) {
 //    console.log(dataDictionary);
     document.getElementById("chartOutput").innerHTML = ""
@@ -413,6 +469,11 @@ function createArtistTable(dataDictionary) {
 
 }
 
+/**
+* Function to build out the display table from the track dictionary 
+* Takes one parameter.
+* dataDictionary: Expects the track dictionary built through the other functions
+*/
 function createTrackTable(dataDictionary) {
 //    console.log(dataDictionary);
     document.getElementById("chartOutput").innerHTML = ""
@@ -487,9 +548,16 @@ function createTrackTable(dataDictionary) {
     adjustTable();
 }
 
+/**
+* Function to add the display table to the webpage.
+* Also adds export buttons.
+* Defines which columns are time-based and thus need a different sort methodology.
+* ^Main reason this is separate from the adjustTableArtist function.
+* Controls the lost pages Alert
+* Takes no parameters.
+*/
 function adjustTable() {
     var script = document.createElement('script');
-    let hello;
 //    script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
 //    script.type = 'text/javascript';
 
@@ -533,6 +601,14 @@ function adjustTable() {
     }
 }
 
+/**
+* Function to add the display table to the webpage.
+* Also adds export buttons.
+* Defines which columns are time-based and thus need a different sort methodology.
+* ^Main reason this is separate from the adjustTable function.
+* Controls the lost pages Alert
+* Takes no parameters.
+*/
 function adjustTableArtist() {
     var script = document.createElement('script');
 //    script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
@@ -575,6 +651,7 @@ function adjustTableArtist() {
         ],
         columnDefs: [
             { type: 'time-uni',targets: 2},
+            { type: 'time-uni',targets: 6},
             { type: 'time-uni',targets: 7}
         ],
       });
