@@ -557,7 +557,7 @@ function adjustTableArtist() {
         dom: `<"top"<"left"lB><"right"f>>rtip`,
         buttons: [
           {
-            text: "Export current table as CSV",
+            text: "Export current page as CSV",
             className: "dt-button custom-button",
             action: function (e, dt, node, config) {
               download_table_as_csv('tableOfOutput');
