@@ -272,7 +272,7 @@ p {
     display:none;
 }
 
-#exportCSVButton {
+button {
   background-color:firebrick;
   border:none;
   color:floralwhite;
@@ -462,4 +462,31 @@ tr:nth-child(even) {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+.dt-buttons {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.dt-button {
+  display: inline-block !important;
+  margin-right: 5px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.right {
+  /* Search box will be on the right */
 }

@@ -411,7 +411,6 @@ function createArtistTable(dataDictionary) {
     document.getElementById("chartOutput").appendChild(table);
     adjustTableArtist();
 
-    //download_table_as_csv("tableOfOutput");
 }
 
 function createTrackTable(dataDictionary) {
@@ -486,12 +485,11 @@ function createTrackTable(dataDictionary) {
 
     document.getElementById("chartOutput").appendChild(table);
     adjustTable();
-
-    //download_table_as_csv("tableOfOutput");
 }
 
 function adjustTable() {
     var script = document.createElement('script');
+    let hello;
 //    script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
 //    script.type = 'text/javascript';
     $(document).ready(function() {
@@ -500,8 +498,10 @@ function adjustTable() {
                 columnDefs: [
                         { type: 'time-uni',targets: 2},
                     { type: 'time-uni',targets: 7}
-                    ]
+                    ],
+                buttons: [ 'copy', 'csv' ]
             });
+
 //        } );
     });
     if (lostPages.length >0 ) {
@@ -518,17 +518,48 @@ function adjustTableArtist() {
     var script = document.createElement('script');
 //    script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
 //    script.type = 'text/javascript';
+//     $(document).ready(function() {
+// //        $(tableOfOutput).ready(function() {
+//             $('#tableOfOutput').DataTable({
+//               buttons: ['csv'],
+//                 columnDefs: [
+//                         { type: 'time-uni',targets: 2},
+//                     { type: 'time-uni',targets: 6},
+//                     { type: 'time-uni',targets: 7}
+//                     ],
+//                     buttons: ['csv']
+//             });
+// //        } );
+//     });
+
     $(document).ready(function() {
-//        $(tableOfOutput).ready(function() {
-            $('#tableOfOutput').DataTable({
-                columnDefs: [
-                        { type: 'time-uni',targets: 2},
-                    { type: 'time-uni',targets: 6},
-                    { type: 'time-uni',targets: 7}
-                    ]
-            });
-//        } );
+
+      $('#tableOfOutput').DataTable({
+        dom: `<"top"<"left"lB><"right"f>>rtip`,
+        buttons: [
+          {
+            text: "Export current table as CSV",
+            action: function (e, dt, node, config) {
+              download_table_as_csv('tableOfOutput');
+              dt.processing(false);
+            }
+          },
+          {
+            extend: "csv",
+            text: "Export entire table as CSV",
+            filename: function() {
+              return `${lastfmUsername}_${lastfmMetric}s_${lastfmTimeframe}`;
+            }
+          }
+        ],
+        columnDefs: [
+            { type: 'time-uni',targets: 2},
+            { type: 'time-uni',targets: 7}
+        ],
+      });
+
     });
+
     if (lostPages.length >0 ) {
         if (fiveHundredAlert > 0) {
             fiveHundredAlert--
@@ -548,6 +579,11 @@ function download_table_as_csv(table_id, separator = ',') {
 
   var rows = document.querySelectorAll('table#' + table_id + ' tr');
   var csv = [];
+
+  // let table = new DataTable("#tableOfOutput");
+  // var data = table.buttons.exportData();
+  // console.log(data);
+
   for (var i = 0; i < rows.length; i++) {
       var row = [], cols = rows[i].querySelectorAll('td, th');
       for (var j = 0; j < cols.length; j++) {
