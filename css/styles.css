@@ -272,20 +272,18 @@ p {
     display:none;
 }
 
-button {
-  background-color:firebrick;
-  border:none;
-  color:floralwhite;
-  padding:8px;
-  outline:0;
-  border-radius:20px;
-  box-shadow:5px;
-  text-align:center;
-  align-items: center;
-  justify-content: center;
-  display: none;
-  margin-left: 2em;
-  margin-right: 1em;
+.custom-button {
+  background:firebrick !important;
+  border:none !important;
+  color:floralwhite !important;
+  padding:8px !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+  outline:0 !important;
+  border-radius:20px !important;
+  text-align:center !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /*
@@ -464,16 +462,6 @@ tr:nth-child(even) {
     opacity: 1;
 }
 
-.dt-buttons {
-  display: inline-block;
-  margin-right: 20px;
-}
-
-.dt-button {
-  display: inline-block !important;
-  margin-right: 5px;
-}
-
 .top {
   display: flex;
   justify-content: space-between;
@@ -485,8 +473,4 @@ tr:nth-child(even) {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.right {
-  /* Search box will be on the right */
 }

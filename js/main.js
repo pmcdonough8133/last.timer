@@ -492,18 +492,37 @@ function adjustTable() {
     let hello;
 //    script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
 //    script.type = 'text/javascript';
-    $(document).ready(function() {
-//        $(tableOfOutput).ready(function() {
-            $('#tableOfOutput').DataTable({
-                columnDefs: [
-                        { type: 'time-uni',targets: 2},
-                    { type: 'time-uni',targets: 7}
-                    ],
-                buttons: [ 'copy', 'csv' ]
-            });
 
-//        } );
+    $(document).ready(function() {
+
+      $('#tableOfOutput').DataTable({
+        dom: `<"top"<"left"lB><"right"f>>rtip`,
+        buttons: [
+          {
+            text: "Export current table as CSV",
+            className: "dt-button custom-button",
+            action: function (e, dt, node, config) {
+              download_table_as_csv('tableOfOutput');
+              dt.processing(false);
+            }
+          },
+          {
+            extend: "csv",
+            text: "Export entire table as CSV",
+            className: "dt-button custom-button",
+            filename: function() {
+              return `${lastfmUsername}_${lastfmMetric}s_${lastfmTimeframe}`;
+            }
+          }
+        ],
+        columnDefs: [
+            { type: 'time-uni',targets: 2},
+            { type: 'time-uni',targets: 7}
+        ],
+      });
+
     });
+
     if (lostPages.length >0 ) {
         if (fiveHundredAlert > 0) {
             fiveHundredAlert--
@@ -539,6 +558,7 @@ function adjustTableArtist() {
         buttons: [
           {
             text: "Export current table as CSV",
+            className: "dt-button custom-button",
             action: function (e, dt, node, config) {
               download_table_as_csv('tableOfOutput');
               dt.processing(false);
@@ -547,6 +567,7 @@ function adjustTableArtist() {
           {
             extend: "csv",
             text: "Export entire table as CSV",
+            className: "dt-button custom-button",
             filename: function() {
               return `${lastfmUsername}_${lastfmMetric}s_${lastfmTimeframe}`;
             }
