@@ -184,14 +184,16 @@ function gatherTracks(listofNamesTemp) {
         requestTwo.onload = function() {
             var data = JSON.parse(this.response);
             totalPageLimit = Number(data.toptracks['@attr'].totalPages);
-//            console.log("Total Pages = "+totalPageLimit);
-//            var totalTracks = data.toptracks['@attr'].total;
-            for (var j = 1; j < totalPageLimit+1; j++) {
-//                if (totalPageLimit > 60) {
-//                    var timeDelay = Math.floor(Math.pow(Math.random(), 2) * 2000 * j)
-//                    setTimeout(console.log("delaying calls "+String( timeDelay)),timeDelay)
-//                }
-                promises.push(gatherTracksPerPage(listofNamesTemp, j));
+            processTrackData(data, listofNamesTemp, 1);
+            promises.push(Promise.resolve());
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            for (let j = 2; j < totalPageLimit+1; j++) {
+                if (totalPageLimit > 30) {
+                    let delayMs = j * (Math.floor(Math.random() * 500) + 200);
+                    promises.push(sleep(delayMs).then(() => gatherTracksPerPage(listofNamesTemp, j)));
+                } else {
+                    promises.push(gatherTracksPerPage(listofNamesTemp, j));
+                }
             }
             promiseProgress(promises,function(results) {
                 document.getElementById("loadingMessages").innerHTML = "Calculating Track durations... Completed pages "+results+" out of "+totalPageLimit;
@@ -212,118 +214,57 @@ function gatherTracks(listofNamesTemp) {
 * currentPage: Expects an integer to indicate which page the function should call for gathering tracks
 */
 function gatherTracksPerPage(listofNames, currentPage) {
-    return new Promise (function(resolve) {
+    return new Promise(function(resolve) {
         var restAPIcallThree = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=" + lastfmUsername + "&period=" + lastfmTimeframe + "&limit=1000&page=" + currentPage + "&api_key=bc139a6bdeaa921ed70e49ca9a21f683&format=json";
-        gatherTPPrequest(restAPIcallThree,currentPage,5).then(function(data) {
-            try {
-                for (var i = 0; i < data.toptracks.track.length; i++) {
-    //                console.log("working on track "+i);
-                    /**
-                    If the list of names is null, then this is being used for a top tracks generation and should just return the data as a track dictionary
-                    */
-                    if (listofNames == null) {
-                        var tempDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration
-                        var curPagePlaycountRank = (Number(currentPage)-1)*1000
-                        durationDict.push({
-                            trackName:data.toptracks.track[i].name,
-                            artistName:data.toptracks.track[i].artist.name,
-                            duration:tempDuration,
-                            trackDuration:data.toptracks.track[i].duration,
-                            durHours:null,
-                            durMinutes:null,
-                            durSeconds:null,
-                            playcount:Number(data.toptracks.track[i].playcount),
-                            playtimeRank:null,
-                            playcountRank:curPagePlaycountRank+i+1,
-                            emptyTracks:0
-                        });
-                    /**
-                    If the list of names is present, then this is being used for a top artist tracks generation and the track length is to be added to the artist dictionary's duration field multiplied by the number of plays alongside the playcount
-                    */
-                    } else { //if (listofNames.includes(data.toptracks.track[i].artist.name)) { 
-                        for (var d = 0; d < durationDict.length; d++) {
-                            if (durationDict[d].artistName.toLowerCase() == data.toptracks.track[i].artist.name.toLowerCase()) {
-                                var addDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration;
-                                if (addDuration == 0 ) {
-                                    tracksWithNoTime.push(data.toptracks.track[i].artist.name+" --- "+data.toptracks.track[i].name);
-                                    durationDict[d].emptyTracks += Number(data.toptracks.track[i].playcount);
-                                }
-                                durationDict[d].duration += addDuration;
-                                durationDict[d].playcount += Number(data.toptracks.track[i].playcount);
-    //                                console.log("Adding "+addDuration+" to "+durationDict[d].artistName)
-                            }
+        
+        gatherTPPrequest(restAPIcallThree, currentPage, 5).then(function(data) {
+            if (data && data.toptracks) {
+                processTrackData(data, listofNames, currentPage);
+            }
+            resolve();
+        });
+    });
+}
+
+/**
+ * Processes track data and populates durationDict
+ */
+function processTrackData(data, listofNames, currentPage) {
+    try {
+        for (var i = 0; i < data.toptracks.track.length; i++) {
+            if (listofNames == null) {
+                var tempDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration;
+                var curPagePlaycountRank = (Number(currentPage) - 1) * 1000;
+                durationDict.push({
+                    trackName: data.toptracks.track[i].name,
+                    artistName: data.toptracks.track[i].artist.name,
+                    duration: tempDuration,
+                    trackDuration: data.toptracks.track[i].duration,
+                    durHours: null,
+                    durMinutes: null,
+                    durSeconds: null,
+                    playcount: Number(data.toptracks.track[i].playcount),
+                    playtimeRank: null,
+                    playcountRank: curPagePlaycountRank + i + 1,
+                    emptyTracks: 0
+                });
+            } else {
+                for (var d = 0; d < durationDict.length; d++) {
+                    if (durationDict[d].artistName.toLowerCase() == data.toptracks.track[i].artist.name.toLowerCase()) {
+                        var addDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration;
+                        if (addDuration == 0) {
+                            tracksWithNoTime.push(data.toptracks.track[i].artist.name + " --- " + data.toptracks.track[i].name);
+                            durationDict[d].emptyTracks += Number(data.toptracks.track[i].playcount);
                         }
+                        durationDict[d].duration += addDuration;
+                        durationDict[d].playcount += Number(data.toptracks.track[i].playcount);
                     }
                 }
-                resolve();
             }
-            catch(err) {
-                console.log("Caught error:", err)
-            }
-        });
-        var requestThree = new XMLHttpRequest();
-//        requestThree.onreadystatechange=function() {
-//            if (requestThree.readyState === 4) {
-//                if (requestThree.status === 200) {
-//                    // do nothing
-//                } else {
-//                    console.log("Last.fm returned "+requestThree.status+" error. Page "+currentPage+" was lost. Trying again for more accurate results.");
-//                    if (requestThree.status === 500) {
-//                        promises.push(gatherTracksPerPage(listofNames,currentPage));
-//                    }
-//                    setTimeout(resolve(),10000)
-//                    if (fiveHundredAlert > 0) {
-//                        fiveHundredAlert--;
-//                        alert("This app has encountered Internal Service Errors from Last.fm, it will try to complete but it may lose some data.  Check the playcounts for accuracy, re-run to try again.")
-//                    }
-////                    resolve();
-//                }
-//            }
-//        }
-//        requestThree.open('GET', restAPIcallThree, true);
-//        requestThree.onload = function() {
-//            var data = JSON.parse(this.response);
-//            try {
-//                for (var i = 0; i < data.toptracks.track.length; i++) {
-//    //                console.log("working on track "+i);
-//                    if (listofNames == null) {
-//                        var tempDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration
-//                        durationDict.push({
-//                            trackName:data.toptracks.track[i].name,
-//                            artistName:data.toptracks.track[i].artist.name,
-//                            duration:tempDuration,
-//                            trackDuration:data.toptracks.track[i].duration,
-//                            durHours:null,
-//                            durMinutes:null,
-//                            durSeconds:null,
-//                            playcount:Number(data.toptracks.track[i].playcount),
-//                            playtimeRank:null,
-//                            playcountRank:i+1,
-//                            emptyTracks:0
-//                        });
-//                    } else if (listofNames.includes(data.toptracks.track[i].artist.name)) {
-//                        for (var d = 0; d < durationDict.length; d++) {
-//                            if (durationDict[d].artistName == data.toptracks.track[i].artist.name) {
-//                                var addDuration = data.toptracks.track[i].playcount * data.toptracks.track[i].duration;
-//                                if (addDuration == 0 ) {
-//                                    tracksWithNoTime.push(data.toptracks.track[i].artist.name+" --- "+data.toptracks.track[i].name);
-//                                    durationDict[d].emptyTracks += Number(data.toptracks.track[i].playcount);
-//                                }
-//                                durationDict[d].duration += addDuration;
-//                                durationDict[d].playcount += Number(data.toptracks.track[i].playcount);
-////                                console.log("Adding "+addDuration+" to "+durationDict[d].artistName)
-//                            }
-//                        }
-//                    }
-//                }
-//                resolve();
-//            }
-//            catch(err) {
-//                console.log("Caught error:", err)
-//            }
-//        }
-//        requestThree.send();
-    });
+        }
+    } catch(err) {
+        console.log("Caught error:", err);
+    }
 }
 
 /**
@@ -361,9 +302,10 @@ function gatherTPPrequest(requestVar,currentPage,retryCounter){
         requestThree.send();
     }).catch(function(message) {
         if (retryCounter > 0){
-            retryCounter--
-//            setTimeout(console.log("delaying retry calls 20 seconds"),20000)
-            return gatherTPPrequest(requestVar,currentPage,retryCounter)
+            retryCounter--;
+            console.log("Last.fm error. Delaying retry 5 seconds for page " + currentPage);
+            return new Promise(resolve => setTimeout(resolve, 5000))
+                .then(() => gatherTPPrequest(requestVar, currentPage, retryCounter));
         } else {
             console.log("Last.fm returned "+requestThree.status+" error. Page "+currentPage+" was lost for good.")
             lostPages.push(currentPage)
